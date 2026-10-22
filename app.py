@@ -1,10 +1,11 @@
 """
-🧩 لعبة الألغاز - نسخة عربية كاملة
-==================================
-- واجهة عربية (RTL)
-- 10 مستويات (من 3x3 إلى 12x12)
-- ستايل خشبي (Wood Style)
-- متوافقة مع Streamlit Cloud
+🧩 Puzzle Blocks - نسخة Streamlit
+=================================
+لعبة بلوكات ملونة بحال Puzzle Blocks:
+- اللوحة: الطول 12 × العرض 6
+- بلوكات بأشكال مختلفة (L, I, O, T, S...)
+- نظام Score
+- ستايل خشبي عربي
 """
 
 import streamlit as st
@@ -15,7 +16,7 @@ import time
 # إعدادات الصفحة
 # ============================================================
 st.set_page_config(
-    page_title="🧩 لعبة الألغاز",
+    page_title="🧩 Puzzle Blocks",
     page_icon="🧩",
     layout="centered",
     initial_sidebar_state="collapsed",
@@ -26,7 +27,6 @@ st.set_page_config(
 # ============================================================
 WOOD_STYLE = """
 <style>
-/* ---------- الخط العربي ---------- */
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
 
 html, body, [class*="css"] {
@@ -56,10 +56,9 @@ html, body, [class*="css"] {
     background-attachment: fixed;
 }
 
-/* ---------- الحاوية الرئيسية ---------- */
 .block-container {
-    padding-top: 2rem;
-    padding-bottom: 2rem;
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
     background: rgba(139, 90, 43, 0.15);
     border-radius: 20px;
     backdrop-filter: blur(2px);
@@ -74,7 +73,7 @@ h1 {
         4px 4px 8px rgba(0,0,0,0.5) !important;
     font-weight: 900 !important;
     letter-spacing: 1px;
-    padding: 10px;
+    padding: 12px;
     background: linear-gradient(180deg, #A0522D, #6B3E1F);
     border: 4px solid #4A2C0F;
     border-radius: 15px;
@@ -90,12 +89,12 @@ h2, h3 {
     text-shadow: 1px 1px 2px #000;
 }
 
-/* ---------- المقاييس (Moves / Time) ---------- */
+/* ---------- المقاييس ---------- */
 [data-testid="stMetric"] {
     background: linear-gradient(180deg, #D2B48C, #A0522D);
     border: 3px solid #4A2C0F;
     border-radius: 12px;
-    padding: 15px;
+    padding: 12px;
     box-shadow:
         inset 0 2px 0 rgba(255,255,255,0.3),
         inset 0 -3px 0 rgba(0,0,0,0.3),
@@ -114,28 +113,27 @@ h2, h3 {
     font-weight: 900 !important;
     text-shadow: 2px 2px 3px rgba(0,0,0,0.6) !important;
     text-align: center !important;
-    font-size: 28px !important;
+    font-size: 26px !important;
 }
 
-/* ---------- أزرار البطائق ---------- */
+/* ---------- أزرار ---------- */
 div[data-testid="stButton"] > button {
     width: 100%;
-    height: 70px;
-    font-size: 24px;
+    font-size: 18px;
     font-weight: 900;
     color: #FFFFFF !important;
     background:
         radial-gradient(circle at 30% 30%, rgba(255,255,255,0.3), transparent 60%),
         linear-gradient(180deg, #D2691E 0%, #8B4513 100%);
-    border: 4px solid #4A2C0F;
-    border-radius: 12px;
+    border: 3px solid #4A2C0F;
+    border-radius: 10px;
     box-shadow:
         inset 0 3px 0 rgba(255,255,255,0.25),
         inset 0 -4px 0 rgba(0,0,0,0.3),
-        0 6px 12px rgba(0,0,0,0.5);
+        0 5px 10px rgba(0,0,0,0.5);
     text-shadow: 2px 2px 3px rgba(0,0,0,0.7);
+    padding: 8px !important;
     transition: all 0.1s ease;
-    padding: 0 !important;
 }
 
 div[data-testid="stButton"] > button:hover {
@@ -143,40 +141,10 @@ div[data-testid="stButton"] > button:hover {
     background:
         radial-gradient(circle at 30% 30%, rgba(255,255,255,0.4), transparent 60%),
         linear-gradient(180deg, #E07B39 0%, #A0522D 100%);
-    box-shadow:
-        inset 0 3px 0 rgba(255,255,255,0.3),
-        inset 0 -4px 0 rgba(0,0,0,0.3),
-        0 8px 16px rgba(0,0,0,0.6);
 }
 
 div[data-testid="stButton"] > button:active {
     transform: translateY(2px);
-    box-shadow:
-        inset 0 2px 0 rgba(0,0,0,0.3),
-        0 2px 6px rgba(0,0,0,0.4);
-}
-
-/* ---------- البلاصة الخاوية ---------- */
-.empty-slot {
-    width: 100%;
-    height: 70px;
-    background: rgba(74, 44, 15, 0.6);
-    border: 3px dashed #3E1F0B;
-    border-radius: 12px;
-    box-shadow: inset 0 4px 10px rgba(0,0,0,0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* ---------- أزرار التحكم ---------- */
-div[data-testid="stButton"] > button[kind="secondary"] {
-    height: 55px;
-    font-size: 18px;
-    background:
-        radial-gradient(circle at 30% 30%, rgba(255,255,255,0.25), transparent 60%),
-        linear-gradient(180deg, #B8860B 0%, #8B6508 100%);
-    border: 3px solid #4A2C0F;
 }
 
 /* ---------- Selectbox ---------- */
@@ -194,7 +162,7 @@ div[data-testid="stButton"] > button[kind="secondary"] {
     font-weight: 700 !important;
 }
 
-/* ---------- رسائل النجاح ---------- */
+/* ---------- تنبيهات ---------- */
 [data-testid="stAlert"] {
     border-radius: 15px;
     border: 4px solid #4A2C0F;
@@ -202,27 +170,13 @@ div[data-testid="stButton"] > button[kind="secondary"] {
     box-shadow: 0 6px 15px rgba(0,0,0,0.4);
 }
 
-/* ---------- النصوص ---------- */
 p, span, label {
     color: #F5DEB3;
 }
 
-/* ---------- إخفاء عناصر Streamlit غير الضرورية ---------- */
 #MainMenu {visibility: hidden;}
 footer {visibility: hidden;}
 header {visibility: hidden;}
-
-/* ---------- لوجو الخشب على الحواف ---------- */
-.stApp::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 8px;
-    background: linear-gradient(90deg, #4A2C0F, #8B4513, #4A2C0F);
-    z-index: 999;
-}
 </style>
 """
 
@@ -230,245 +184,433 @@ st.markdown(WOOD_STYLE, unsafe_allow_html=True)
 
 
 # ============================================================
-# منطق اللعبة
+# ثوابت اللعبة
 # ============================================================
-class PuzzleBoard:
-    """لوحة اللغز - المسؤولة عن الحالة والحركات"""
+ROWS = 12   # الطول
+COLS = 6    # العرض
 
-    def __init__(self, size=3):
-        self.size = size
-        self.reset()
-        self.shuffle()
+# ألوان البلوكات
+COLORS = {
+    "red":    ("#FF4D4D", "#C62828"),
+    "blue":   ("#4D94FF", "#1565C0"),
+    "green":  ("#4DD94D", "#2E7D32"),
+    "yellow": ("#FFD24D", "#F9A825"),
+    "orange": ("#FF9F4D", "#E65100"),
+    "purple": ("#B84DFF", "#6A1B9A"),
+    "pink":   ("#FF4DB8", "#AD1457"),
+    "cyan":   ("#4DFFFF", "#00838F"),
+}
 
-    def reset(self):
-        total = self.size * self.size
-        self.board = list(range(1, total)) + [0]
-        self.empty_index = len(self.board) - 1
+COLOR_KEYS = list(COLORS.keys())
 
-    def get_neighbors(self, idx):
-        row, col = idx // self.size, idx % self.size
-        neighbors = []
-        if row > 0:
-            neighbors.append(idx - self.size)
-        if row < self.size - 1:
-            neighbors.append(idx + self.size)
-        if col > 0:
-            neighbors.append(idx - 1)
-        if col < self.size - 1:
-            neighbors.append(idx + 1)
-        return neighbors
+# أشكال البلوكات (إحداثيات نسبية)
+SHAPES = {
+    "I2":  [(0, 0), (0, 1)],
+    "I3":  [(0, 0), (0, 1), (0, 2)],
+    "I4":  [(0, 0), (0, 1), (0, 2), (0, 3)],
+    "O":   [(0, 0), (0, 1), (1, 0), (1, 1)],
+    "L":   [(0, 0), (1, 0), (2, 0), (2, 1)],
+    "J":   [(0, 1), (1, 1), (2, 1), (2, 0)],
+    "T":   [(0, 0), (0, 1), (0, 2), (1, 1)],
+    "S":   [(0, 1), (0, 2), (1, 0), (1, 1)],
+    "Z":   [(0, 0), (0, 1), (1, 1), (1, 2)],
+    "Tiny":[(0, 0)],
+    "Line2V": [(0, 0), (1, 0)],
+}
 
-    def shuffle(self):
-        # حركات عشوائية صحيحة = اللغز دايماً قابل للحل
-        for _ in range(self.size * self.size * 60):
-            neighbors = self.get_neighbors(self.empty_index)
-            n = random.choice(neighbors)
-            self.board[self.empty_index], self.board[n] = (
-                self.board[n], self.board[self.empty_index],
-            )
-            self.empty_index = n
-        if self.is_solved():
-            self.shuffle()
+SHAPE_NAMES = list(SHAPES.keys())
 
-    def try_move(self, idx):
-        if idx == self.empty_index:
+
+# ============================================================
+# توليد البلوكات
+# ============================================================
+def random_block():
+    """توليد بلوك عشوائي."""
+    shape_key = random.choice(SHAPE_NAMES)
+    color_key = random.choice(COLOR_KEYS)
+    cells = SHAPES[shape_key]
+    return {
+        "shape": shape_key,
+        "color": color_key,
+        "cells": cells,
+    }
+
+
+def blocks_to_grid(block):
+    """تحويل البلوك لمصفوفة صغيرة للعرض."""
+    cells = block["cells"]
+    if not cells:
+        return []
+    max_r = max(c[0] for c in cells) + 1
+    max_c = max(c[1] for c in cells) + 1
+    grid = [[None for _ in range(max_c)] for _ in range(max_r)]
+    for (r, c) in cells:
+        grid[r][c] = block["color"]
+    return grid
+
+
+# ============================================================
+# منطق اللوحة
+# ============================================================
+def new_board():
+    return [[None for _ in range(COLS)] for _ in range(ROWS)]
+
+
+def can_place(board, block, row, col):
+    """هل يمكن وضع البلوك في (row, col)؟"""
+    for (dr, dc) in block["cells"]:
+        r, c = row + dr, col + dc
+        if r < 0 or r >= ROWS or c < 0 or c >= COLS:
             return False
-        if idx in self.get_neighbors(self.empty_index):
-            self.board[self.empty_index], self.board[idx] = (
-                self.board[idx], self.board[self.empty_index],
-            )
-            self.empty_index = idx
-            return True
-        return False
+        if board[r][c] is not None:
+            return False
+    return True
 
-    def is_solved(self):
-        return self.board == list(range(1, self.size * self.size)) + [0]
+
+def place_block(board, block, row, col):
+    """وضع البلوك على اللوحة."""
+    for (dr, dc) in block["cells"]:
+        r, c = row + dr, col + dc
+        board[r][c] = block["color"]
+
+
+def clear_lines(board):
+    """مسح الصفوف والأعمدة الممتلئة، وإرجاع عدد المسوح."""
+    cleared = 0
+    # الصفوف
+    for r in range(ROWS):
+        if all(board[r][c] is not None for c in range(COLS)):
+            for c in range(COLS):
+                board[r][c] = None
+            cleared += 1
+    # الأعمدة
+    for c in range(COLS):
+        if all(board[r][c] is not None for r in range(ROWS)):
+            for r in range(ROWS):
+                board[r][c] = None
+            cleared += 1
+    return cleared
+
+
+def score_for_clear(cleared):
+    """حساب النقاط."""
+    if cleared == 0:
+        return 0
+    # نقاط متزايدة
+    return cleared * 100 + (cleared - 1) * 50
+
+
+def can_place_anywhere(board, block):
+    """هل يمكن وضع البلوك في أي مكان؟"""
+    for r in range(ROWS):
+        for c in range(COLS):
+            if can_place(board, block, r, c):
+                return True
+    return False
 
 
 # ============================================================
-# إدارة المستويات (10 مستويات)
-# ============================================================
-LEVELS = [
-    {"id": 1,  "size": 3,  "name": "المستوى 1 - مبتدئ (3×3)",     "emoji": "🟢"},
-    {"id": 2,  "size": 3,  "name": "المستوى 2 - سريع (3×3)",       "emoji": "🟢"},
-    {"id": 3,  "size": 4,  "name": "المستوى 3 - سهل (4×4)",        "emoji": "🟡"},
-    {"id": 4,  "size": 4,  "name": "المستوى 4 - متوسط (4×4)",      "emoji": "🟡"},
-    {"id": 5,  "size": 5,  "name": "المستوى 5 - تحدٍ (5×5)",       "emoji": "🟠"},
-    {"id": 6,  "size": 5,  "name": "المستوى 6 - صعب (5×5)",        "emoji": "🟠"},
-    {"id": 7,  "size": 6,  "name": "المستوى 7 - خبير (6×6)",       "emoji": "🔴"},
-    {"id": 8,  "size": 7,  "name": "المستوى 8 - محترف (7×7)",      "emoji": "🔴"},
-    {"id": 9,  "size": 8,  "name": "المستوى 9 - أسطوري (8×8)",     "emoji": "🟣"},
-    {"id": 10, "size": 10, "name": "المستوى 10 - وحشي (10×10)",    "emoji": "⚫"},
-]
-
-LEVEL_MAP = {lvl["id"]: lvl for lvl in LEVELS}
-
-
-# ============================================================
-# إدارة الحالة (Session State)
+# إدارة الحالة
 # ============================================================
 def init_state():
-    if "level_id" not in st.session_state:
-        st.session_state.level_id = 1
-    if "moves" not in st.session_state:
-        st.session_state.moves = 0
-    if "start_time" not in st.session_state:
-        st.session_state.start_time = time.time()
-    if "elapsed" not in st.session_state:
-        st.session_state.elapsed = 0
-    if "game" not in st.session_state:
-        _new_game(st.session_state.level_id)
-    if "win_shown" not in st.session_state:
-        st.session_state.win_shown = False
+    if "board" not in st.session_state:
+        st.session_state.board = new_board()
+    if "score" not in st.session_state:
+        st.session_state.score = 0
+    if "high_score" not in st.session_state:
+        st.session_state.high_score = 0
+    if "blocks" not in st.session_state:
+        st.session_state.blocks = [random_block() for _ in range(3)]
+    if "selected_block" not in st.session_state:
+        st.session_state.selected_block = 0
+    if "game_over" not in st.session_state:
+        st.session_state.game_over = False
 
 
-def _new_game(level_id):
-    lvl = LEVEL_MAP[level_id]
-    st.session_state.game = PuzzleBoard(lvl["size"])
-    st.session_state.moves = 0
-    st.session_state.start_time = time.time()
-    st.session_state.elapsed = 0
+def reset_game():
+    st.session_state.board = new_board()
+    st.session_state.score = 0
+    st.session_state.blocks = [random_block() for _ in range(3)]
+    st.session_state.selected_block = 0
+    st.session_state.game_over = False
     st.session_state.win_shown = False
 
 
-def change_level(new_level_id):
-    if new_level_id != st.session_state.level_id:
-        st.session_state.level_id = new_level_id
-        _new_game(new_level_id)
-        st.rerun()
+def refill_blocks():
+    """إعادة تعبئة 3 بلوكات جديدة."""
+    st.session_state.blocks = [random_block() for _ in range(3)]
+    st.session_state.selected_block = 0
+
+
+def check_game_over():
+    """هل انتهت اللعبة؟"""
+    board = st.session_state.board
+    for block in st.session_state.blocks:
+        if can_place_anywhere(board, block):
+            return False
+    return True
 
 
 # ============================================================
-# رسم الواجهة
+# رسم البلوك الصغير (HTML)
+# ============================================================
+def render_small_block(block, selected=False):
+    """رسم بلوك صغير بـ HTML."""
+    grid = blocks_to_grid(block)
+    if not grid:
+        return ""
+
+    border = "4px solid #FFD24D" if selected else "2px solid #4A2C0F"
+    size = 26
+
+    html = f"""
+    <div style="
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 6px;
+        background: rgba(74,44,15,0.4);
+        border-radius: 8px;
+        border: {border};
+        box-shadow: inset 0 2px 6px rgba(0,0,0,0.5);
+    ">
+    """
+    for row in grid:
+        html += "<div style='display:flex;'>"
+        for cell in row:
+            if cell is None:
+                html += f"<div style='width:{size}px;height:{size}px;'></div>"
+            else:
+                light, dark = COLORS[cell]
+                html += f"""
+                <div style="
+                    width:{size}px;height:{size}px;
+                    background: radial-gradient(circle at 30% 30%, {light}, {dark});
+                    border: 2px solid #4A2C0F;
+                    border-radius: 4px;
+                    box-shadow: inset 0 1px 0 rgba(255,255,255,0.4),
+                                inset 0 -2px 0 rgba(0,0,0,0.3);
+                    margin: 1px;
+                    box-sizing: border-box;
+                "></div>
+                """
+        html += "</div>"
+    html += "</div>"
+    return html
+
+
+# ============================================================
+# رسم اللوحة
+# ============================================================
+def render_board():
+    board = st.session_state.board
+
+    # حجم الخلايا حسب عرض الشاشة - نستخدم table
+    cell_size = 42
+
+    html = """
+    <div style="
+        display: flex;
+        justify-content: center;
+        padding: 12px;
+        background: linear-gradient(135deg, #5C3317, #3E1F0B);
+        border-radius: 15px;
+        border: 5px solid #4A2C0F;
+        box-shadow:
+            inset 0 4px 15px rgba(0,0,0,0.6),
+            0 8px 25px rgba(0,0,0,0.5);
+        margin: 10px auto;
+        width: fit-content;
+    ">
+    <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px;">
+    """
+
+    for r in range(ROWS):
+        for c in range(COLS):
+            val = board[r][c]
+            if val is None:
+                bg = "rgba(74,44,15,0.5)"
+                border = "2px solid #3E1F0B"
+                shadow = "inset 0 2px 6px rgba(0,0,0,0.5)"
+                extra = ""
+            else:
+                light, dark = COLORS[val]
+                bg = f"radial-gradient(circle at 30% 30%, {light}, {dark})"
+                border = "2px solid #4A2C0F"
+                shadow = (
+                    "inset 0 2px 0 rgba(255,255,255,0.4), "
+                    "inset 0 -3px 0 rgba(0,0,0,0.3), "
+                    "0 2px 4px rgba(0,0,0,0.4)"
+                )
+                extra = "border-radius:6px;"
+
+            html += f"""
+            <div style="
+                width:{cell_size}px;
+                height:{cell_size}px;
+                background: {bg};
+                border: {border};
+                border-radius: 6px;
+                box-shadow: {shadow};
+                {extra}
+            "></div>
+            """
+
+    html += "</div></div>"
+    st.markdown(html, unsafe_allow_html=True)
+
+
+# ============================================================
+# واجهة المستخدم
 # ============================================================
 def render_header():
-    st.markdown("# 🧩 لعبة الألغاز الخشبية")
+    st.markdown("# 🧩 Puzzle Blocks")
     st.markdown(
-        "<p style='text-align:center; color:#F5DEB3; font-size:16px;"
+        "<p style='text-align:center; color:#F5DEB3; font-size:15px;"
         " text-shadow:1px 1px 2px #000;'>"
-        "حرّك المربعات حتى ترتّبها من 1 إلى الأخير — استعمل الفأرة أو اللمس"
+        "اختر بلوكاً، ثم اختر صفاً وعموداً لوضعه — املأ الصفوف والأعمدة لمسحها!"
         "</p>",
         unsafe_allow_html=True,
     )
 
 
 def render_stats():
-    game = st.session_state.game
-    elapsed = st.session_state.elapsed
-    if not game.is_solved() and st.session_state.moves > 0:
-        elapsed = int(time.time() - st.session_state.start_time)
-        st.session_state.elapsed = elapsed
-
-    minutes = elapsed // 60
-    seconds = elapsed % 60
-
     col1, col2, col3 = st.columns(3)
-    col1.metric("🔄 الحركات", st.session_state.moves)
-    col2.metric("⏱️ الوقت", f"{minutes:02d}:{seconds:02d}")
-    col3.metric("🎯 المستوى", f"{st.session_state.level_id} / 10")
+    col1.metric("🏆 النقاط", st.session_state.score)
+    col2.metric("⭐ أفضل نتيجة", st.session_state.high_score)
 
-
-def render_level_selector():
-    st.markdown("### 🎚️ اختر المستوى")
-    options = [lvl["id"] for lvl in LEVELS]
-
-    def fmt(i):
-        lvl = LEVEL_MAP[i]
-        return f"{lvl['emoji']} {lvl['name']}"
-
-    selected = st.selectbox(
-        "المستويات (من 1 إلى 10)",
-        options=options,
-        index=options.index(st.session_state.level_id),
-        format_func=fmt,
-        label_visibility="collapsed",
+    filled = sum(
+        1 for row in st.session_state.board for cell in row if cell is not None
     )
-    if selected != st.session_state.level_id:
-        change_level(selected)
+    total = ROWS * COLS
+    col3.metric("📦 ممتلئ", f"{filled}/{total}")
 
 
-def render_board():
-    game = st.session_state.game
-    size = game.size
+def render_block_selector():
+    st.markdown("### 🎨 البلوكات المتاحة")
 
-    # حجم الخط حسب حجم اللوحة
-    font_size = max(12, min(24, 90 // size))
+    cols = st.columns(3)
+    for i, block in enumerate(st.session_state.blocks):
+        with cols[i]:
+            selected = (i == st.session_state.selected_block)
+            html = render_small_block(block, selected)
+            st.markdown(html, unsafe_allow_html=True)
+            label = "✅ مختار" if selected else "اختر"
+            if st.button(label, key=f"select_{i}", use_container_width=True):
+                st.session_state.selected_block = i
+                st.rerun()
 
-    st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
 
-    for r in range(size):
-        cols = st.columns(size, gap="small")
-        for c in range(size):
-            idx = r * size + c
-            val = game.board[idx]
+def render_placement_controls():
+    """اختيار الصف والعمود للوضع."""
+    if not st.session_state.blocks:
+        return
 
-            with cols[c]:
-                if val == 0:
-                    st.markdown(
-                        "<div class='empty-slot'></div>",
-                        unsafe_allow_html=True,
-                    )
-                else:
-                    clicked = st.button(
-                        str(val),
-                        key=f"tile_{idx}_{st.session_state.level_id}",
-                        use_container_width=True,
-                    )
-                    if clicked:
-                        if game.try_move(idx):
-                            st.session_state.moves += 1
-                            st.rerun()
+    block = st.session_state.blocks[st.session_state.selected_block]
+    board = st.session_state.board
+
+    st.markdown("### 📍 مكان الوضع")
+
+    # الصفوف اللي يمكن فيها الوضع
+    valid_rows = list(range(ROWS))
+    valid_cols = list(range(COLS))
+
+    col1, col2 = st.columns(2)
+    with col1:
+        row = st.selectbox(
+            "الصف (من فوق)",
+            valid_rows,
+            format_func=lambda x: f"صف {x + 1}",
+            key="row_select",
+        )
+    with col2:
+        col = st.selectbox(
+            "العمود (من اليمين)",
+            valid_cols,
+            format_func=lambda x: f"عمود {x + 1}",
+            key="col_select",
+        )
+
+    can = can_place(board, block, row, col)
+
+    if can:
+        st.success(f"✅ يمكن وضع البلوك في ({row + 1}, {col + 1})")
+    else:
+        st.warning(f"❌ لا يمكن وضع البلوك في ({row + 1}, {col + 1})")
+
+    if st.button(
+        "📍 ضع البلوك هنا",
+        use_container_width=True,
+        type="primary",
+        disabled=not can,
+    ):
+        place_block(board, block, row, col)
+        # احذف البلوك من القائمة
+        st.session_state.blocks.pop(st.session_state.selected_block)
+        st.session_state.selected_block = max(0, st.session_state.selected_block - 1)
+
+        # مسح الخطوط
+        cleared = clear_lines(board)
+        if cleared > 0:
+            gained = score_for_clear(cleared)
+            st.session_state.score += gained
+            st.session_state.last_gain = gained
+            st.session_state.last_cleared = cleared
+        else:
+            st.session_state.last_gain = 0
+            st.session_state.last_cleared = 0
+
+        # تعبئة بلوكات جديدة إذا خلصو
+        if not st.session_state.blocks:
+            refill_blocks()
+
+        # التحقق من انتهاء اللعبة
+        if check_game_over():
+            st.session_state.game_over = True
+
+        st.rerun()
 
 
 def render_controls():
     st.markdown("---")
-    col1, col2, col3 = st.columns(3)
+    col1, col2 = st.columns(2)
 
     with col1:
-        if st.button("🔀 خلط جديد", use_container_width=True, type="secondary"):
-            _new_game(st.session_state.level_id)
+        if st.button("🔄 لعبة جديدة", use_container_width=True):
+            reset_game()
             st.rerun()
 
     with col2:
-        if st.button("🔄 إعادة المحاولة", use_container_width=True, type="secondary"):
-            _new_game(st.session_state.level_id)
-            st.rerun()
-
-    with col3:
-        if st.button("💡 حل تلقائي", use_container_width=True, type="secondary"):
-            game = st.session_state.game
-            game.reset()
-            st.session_state.elapsed = int(time.time() - st.session_state.start_time)
-            st.session_state.moves = 0
+        if st.button("💡 تبديل البلوكات", use_container_width=True):
+            refill_blocks()
             st.rerun()
 
 
-def render_win():
-    game = st.session_state.game
-    if game.is_solved() and st.session_state.moves > 0:
-        elapsed = int(time.time() - st.session_state.start_time)
-        minutes = elapsed // 60
-        seconds = elapsed % 60
+def render_game_over():
+    if st.session_state.game_over:
+        if st.session_state.score > st.session_state.high_score:
+            st.session_state.high_score = st.session_state.score
 
-        if not st.session_state.win_shown:
-            st.balloons()
-            st.session_state.win_shown = True
-
-        st.success(
-            f"🎉 **مبروك!** حلّيت المستوى {st.session_state.level_id} بنجاح!\n\n"
-            f"🔄 الحركات: **{st.session_state.moves}**  |  "
-            f"⏱️ الوقت: **{minutes:02d}:{seconds:02d}**"
+        st.error(
+            f"💀 **انتهت اللعبة!**\n\n"
+            f"🏆 النقاط: **{st.session_state.score}**\n\n"
+            f"⭐ أفضل نتيجة: **{st.session_state.high_score}**"
         )
+        if st.button("🎮 ابدأ من جديد", use_container_width=True, type="primary"):
+            reset_game()
+            st.rerun()
 
-        if st.session_state.level_id < 10:
-            if st.button(
-                f"➡️ الانتقال للمستوى {st.session_state.level_id + 1}",
-                type="primary",
-                use_container_width=True,
-            ):
-                change_level(st.session_state.level_id + 1)
-        else:
-            st.info("🏆 أنت بطل! ختمتي جميع المستويات العشرة!")
+
+def render_last_action():
+    """عرض آخر نتيجة مسح."""
+    if st.session_state.get("last_gain", 0) > 0:
+        cleared = st.session_state.get("last_cleared", 0)
+        gained = st.session_state["last_gain"]
+        st.success(
+            f"✨ مسحت **{cleared}** خطوط! حصلت على **+{gained}** نقطة!"
+        )
+        st.session_state.last_gain = 0
 
 
 def render_footer():
@@ -476,7 +618,7 @@ def render_footer():
     st.markdown(
         "<p style='text-align:center; color:#D2B48C; font-size:13px;"
         " text-shadow:1px 1px 2px #000;'>"
-        "🪵 صنع بحب — لعبة الألغاز الخشبية · 10 مستويات · Streamlit"
+        "🪵 Puzzle Blocks — طول 12 × عرض 6 — نسخة Streamlit"
         "</p>",
         unsafe_allow_html=True,
     )
@@ -489,10 +631,15 @@ def main():
     init_state()
     render_header()
     render_stats()
-    render_level_selector()
+    render_last_action()
     render_board()
+    render_block_selector()
+
+    if not st.session_state.game_over:
+        render_placement_controls()
+
     render_controls()
-    render_win()
+    render_game_over()
     render_footer()
 
 
